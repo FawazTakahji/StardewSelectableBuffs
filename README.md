@@ -36,3 +36,21 @@ This mod was made possible by a commission from someone who prefers to remain an
 
   ![Statue of the Dwarf King](assets/dwarf.png)
 </details>
+
+## Building from Source
+The mod build package should locate your game folder automatically. If you need to specify it manually, edit the `.csproj` file:
+```xml
+<PropertyGroup>
+    ...
+    <GamePath>YOUR_GAME_PATH_HERE</GamePath>
+    ...
+</PropertyGroup>
+```
+Alternatively, you can set a global path by creating a `stardewvalley.targets` file in your user profile folder (`%userprofile%` on Windows or `~` on Linux/macOS):
+```xml
+<Project>
+   <PropertyGroup>
+      <GamePath>YOUR_GAME_PATH_HERE</GamePath>
+   </PropertyGroup>
+</Project>
+```
