@@ -1,8 +1,8 @@
 ﻿{
   "Name": "SelectableBuffs",
   "Author": "FawazT",
-  "Version": "1.0.0",
-  "Description": "Allows you to select which buffs you want to apply when using a blessing or dwarf statue.",
+  "Version": "1.1.0",
+  "Description": "Manually choose your preferred blessing from the Statue of Blessings and your desired power from the Statue of the Dwarf King.",
   "UniqueID": "FawazT.SelectableBuffs",
   "EntryDll": "SelectableBuffs.dll",
   "MinimumApiVersion": "4.0.0",
