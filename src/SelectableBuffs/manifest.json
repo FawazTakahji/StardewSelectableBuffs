@@ -1,0 +1,19 @@
+﻿{
+  "Name": "SelectableBuffs",
+  "Author": "FawazT",
+  "Version": "1.0.0",
+  "Description": "Allows you to select which buffs you want to apply when using a blessing or dwarf statue.",
+  "UniqueID": "FawazT.SelectableBuffs",
+  "EntryDll": "SelectableBuffs.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": [
+    "Nexus:44056",
+    "GitHub:FawazTakahji/StardewSelectableBuffs"
+  ],
+  "Dependencies": [
+    {
+      "UniqueID": "focustense.StardewUI",
+      "MinimumVersion": "0.6.1"
+    }
+  ]
+}
