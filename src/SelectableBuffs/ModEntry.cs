@@ -32,6 +32,9 @@ public class ModEntry : Mod
 #else
             Singletons.ViewEngine.PreloadAssets();
             Singletons.ViewEngine.PreloadModels(typeof(ViewModels.SelectionViewModel));
+
+            ViewModels.SelectionViewModel context = new(I18n.ChooseBlessing(), new List<SelectionOption>(), _ => { });
+            IMenuController controller = Singletons.ViewEngine.CreateMenuControllerFromAsset($"Mods/{Singletons.ModManifest.UniqueID}/views/SelectionView", context);
 #endif
         }
         catch (Exception ex)
