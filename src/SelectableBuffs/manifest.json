@@ -1,7 +1,7 @@
 ﻿{
-  "Name": "SelectableBuffs",
+  "Name": "Selectable Buffs",
   "Author": "FawazT",
-  "Version": "1.1.0",
+  "Version": "1.2.0",
   "Description": "Manually choose your preferred blessing from the Statue of Blessings and your desired power from the Statue of the Dwarf King.",
   "UniqueID": "FawazT.SelectableBuffs",
   "EntryDll": "SelectableBuffs.dll",
