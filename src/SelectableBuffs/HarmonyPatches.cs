@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System.Reflection;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using SelectableBuffs.ViewModels;
 using StardewModdingAPI;
@@ -12,17 +13,105 @@ namespace SelectableBuffs;
 
 public class HarmonyPatches
 {
+    private static Harmony _harmony = null!;
+
     public static void Initialize(string uniqueId)
     {
-        Harmony harmony = new(uniqueId);
-        harmony.Patch(
-            original: AccessTools.Method(typeof(StardewObject), "CheckForActionOnBlessedStatue"),
-            prefix: new HarmonyMethod(typeof(ObjectPatch), nameof(ObjectPatch.CheckForActionOnBlessedStatue_Prefix))
-        );
-        harmony.Patch(
-            original: AccessTools.Method(typeof(StardewObject), nameof(StardewObject.checkForAction)),
-            prefix: new HarmonyMethod(typeof(ObjectPatch), nameof(ObjectPatch.CheckForAction_Prefix))
-        );
+        _harmony = new Harmony(uniqueId);
+
+        if (Singletons.Config.PatchStatueOfBlessings)
+        {
+            TryPatchStatueOfBlessings();
+        }
+        if (Singletons.Config.PatchStatueOfDwarfKing)
+        {
+            TryPatchStatueOfDwarfKing();
+        }
+    }
+
+    public static void CheckPatches()
+    {
+        List<MethodBase> methods = _harmony.GetPatchedMethods().ToList();
+        MethodBase checkForActionOnBlessedStatue = AccessTools.Method(typeof(StardewObject), "CheckForActionOnBlessedStatue");
+        MethodBase checkForAction = AccessTools.Method(typeof(StardewObject), nameof(StardewObject.checkForAction));
+
+        if (methods.Any(x => x == checkForActionOnBlessedStatue))
+        {
+            if (!Singletons.Config.PatchStatueOfBlessings)
+            {
+                TryUnpatchStatueOfBlessings(checkForActionOnBlessedStatue);
+            }
+        }
+        else if (Singletons.Config.PatchStatueOfBlessings)
+        {
+            TryPatchStatueOfBlessings(checkForActionOnBlessedStatue);
+        }
+
+        if (methods.Any(x => x == checkForAction))
+        {
+            if (!Singletons.Config.PatchStatueOfDwarfKing)
+            {
+                TryUnpatchStatueOfDwarfKing(checkForAction);
+            }
+        }
+        else if (Singletons.Config.PatchStatueOfDwarfKing)
+        {
+            TryPatchStatueOfDwarfKing(checkForAction);
+        }
+    }
+
+    private static void TryPatchStatueOfBlessings(MethodBase? original = null)
+    {
+        try
+        {
+            _harmony.Patch(
+                original: original ?? AccessTools.Method(typeof(StardewObject), "CheckForActionOnBlessedStatue"),
+                prefix: new HarmonyMethod(typeof(ObjectPatch), nameof(ObjectPatch.CheckForActionOnBlessedStatue_Prefix))
+            );
+        }
+        catch (Exception e)
+        {
+            Singletons.Monitor.Log("Failed to patch Statue of Blessings: " + e, LogLevel.Error);
+        }
+    }
+
+    private static void TryUnpatchStatueOfBlessings(MethodBase original)
+    {
+        try
+        {
+            _harmony.Unpatch(original, AccessTools.Method(typeof(ObjectPatch), nameof(ObjectPatch.CheckForActionOnBlessedStatue_Prefix)));
+        }
+        catch (Exception e)
+        {
+            Singletons.Monitor.Log("Failed to unpatch Statue of Blessings: " + e, LogLevel.Error);
+        }
+    }
+
+    private static void TryPatchStatueOfDwarfKing(MethodBase? original = null)
+    {
+        try
+        {
+            _harmony.Patch(
+                original: original ?? AccessTools.Method(typeof(StardewObject), nameof(StardewObject.checkForAction)),
+                prefix: new HarmonyMethod(typeof(ObjectPatch), nameof(ObjectPatch.CheckForAction_Prefix))
+            );
+        }
+        catch (Exception e)
+        {
+            Singletons.Monitor.Log("Failed to patch Statue of Dwarf King: " + e, LogLevel.Error);
+        }
+    }
+
+    private static void TryUnpatchStatueOfDwarfKing(MethodBase original)
+    {
+        try
+        {
+            _harmony.Unpatch(original, AccessTools.Method(typeof(ObjectPatch), nameof(ObjectPatch.CheckForAction_Prefix)));
+        }
+        catch (Exception e)
+        {
+            Singletons.Monitor.Log("Failed to unpatch Statue of Dwarf King: " + e, LogLevel.Error);
+        }
     }
 }
 

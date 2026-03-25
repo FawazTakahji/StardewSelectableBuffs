@@ -1,4 +1,6 @@
 {
   "choose-blessing": "Choose a Blessing",
-  "chose-power": "Choose a Power"
+  "chose-power": "Choose a Power",
+  "statue-of-blessings-tooltip": "Whether to allow the player to choose blessings from Statue of Blessings.",
+  "statue-of-dwarf-king-tooltip": "Whether to allow the player to choose powers from Statue of the Dwarf King."
 }
