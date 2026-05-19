@@ -5,15 +5,5 @@
   "Description": "Manually choose your preferred blessing from the Statue of Blessings and your desired power from the Statue of the Dwarf King.",
   "UniqueID": "FawazT.SelectableBuffs",
   "EntryDll": "SelectableBuffs.dll",
-  "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": [
-    "Nexus:44056",
-    "GitHub:FawazTakahji/StardewSelectableBuffs"
-  ],
-  "Dependencies": [
-    {
-      "UniqueID": "focustense.StardewUI",
-      "MinimumVersion": "0.6.1"
-    }
-  ]
+  "MinimumApiVersion": "4.0.0"
 }

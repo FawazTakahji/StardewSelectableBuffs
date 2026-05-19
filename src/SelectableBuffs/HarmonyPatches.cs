@@ -1,12 +1,11 @@
 ﻿using System.Reflection;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
-using SelectableBuffs.ViewModels;
 using StardewModdingAPI;
-using StardewUI.Framework;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Constants;
+using StardewValley.GameData.Buffs;
 using StardewObject = StardewValley.Object;
 
 namespace SelectableBuffs;
@@ -119,15 +118,10 @@ public class ObjectPatch
 {
     public static bool CheckForActionOnBlessedStatue_Prefix(StardewObject __instance, ref bool __result, Farmer who, GameLocation location, bool justCheckingForActivitiy)
     {
-        if (Singletons.IsBlessingMenuOpen || Singletons.IsDwarfMenuOpen || justCheckingForActivitiy)
+        if (justCheckingForActivitiy)
         {
             __result = true;
             return false;
-        }
-        if (Singletons.ViewEngine is null)
-        {
-            Singletons.Monitor.Log("Can't show menu because ViewEngine is null.", LogLevel.Warn);
-            return true;
         }
         if (who.stats.Get(StatKeys.Mastery(0)) < 1U)
         {
@@ -142,30 +136,18 @@ public class ObjectPatch
             return false;
         }
 
-        List<SelectionOption> buffs;
-        try
+        KeyValuePair<string, BuffData>[] buffs = Buffs.GetStatueOfBlessingsBuffs();
+        if (buffs.Length < 1)
         {
-            buffs = Buffs.GetStatueOfBlessingsBuffsAsOptions();
-            Singletons.IsBlessingMenuOpen = true;
-        }
-        catch (Exception e)
-        {
-            Singletons.Monitor.Log("Failed to get buffs: " + e, LogLevel.Error);
+            Singletons.Monitor.Log("No statue of blessings buffs found.", LogLevel.Warn);
             return true;
         }
 
-        SelectionViewModel context = new SelectionViewModel(I18n.ChooseBlessing(), buffs, s =>
+        foreach (KeyValuePair<string, BuffData> pair in buffs)
         {
-            if (s != "canceled")
-            {
-                ApplyBlessing(__instance, who, location, s);
-            }
-
-            Singletons.IsBlessingMenuOpen = false;
-        });
-        IMenuController controller = Singletons.ViewEngine.CreateMenuControllerFromAsset($"Mods/{Singletons.ModManifest.UniqueID}/views/SelectionView", context);
-        context.SetController(controller);
-        Game1.activeClickableMenu = controller.Menu;
+            who.applyBuff(pair.Key);
+        }
+        ApplyBlessing(__instance, who, location);
 
         __result = true;
         return false;
@@ -179,16 +161,6 @@ public class ObjectPatch
         {
             return true;
         }
-        if (Singletons.IsBlessingMenuOpen || Singletons.IsDwarfMenuOpen)
-        {
-            __result = true;
-            return false;
-        }
-        if (Singletons.ViewEngine is null)
-        {
-            Singletons.Monitor.Log("Can't show menu because ViewEngine is null.", LogLevel.Warn);
-            return true;
-        }
 
         if (who.stats.Get(StatKeys.Mastery(3)) < 1U)
         {
@@ -197,30 +169,17 @@ public class ObjectPatch
         }
         else if (!who.hasBuffWithNameContainingString("dwarfStatue"))
         {
-            List<SelectionOption> buffs;
-            try
+            KeyValuePair<string, BuffData>[] buffs = Buffs.GetDwarfStatueBuffs();
+            if (buffs.Length < 1)
             {
-                buffs = Buffs.GetDwarfStatueBuffsAsOptions();
-                Singletons.IsDwarfMenuOpen = true;
-            }
-            catch (Exception e)
-            {
-                Singletons.Monitor.Log("Failed to get buffs: " + e, LogLevel.Error);
+                Singletons.Monitor.Log("No dwarf statue buffs found.", LogLevel.Warn);
                 return true;
             }
 
-            SelectionViewModel context = new SelectionViewModel(I18n.ChosePower(), buffs, s =>
+            foreach (KeyValuePair<string, BuffData> pair in buffs)
             {
-                if (s != "canceled")
-                {
-                    who.applyBuff(s);
-                }
-
-                Singletons.IsDwarfMenuOpen = false;
-            });
-            IMenuController controller = Singletons.ViewEngine.CreateMenuControllerFromAsset($"Mods/{Singletons.ModManifest.UniqueID}/views/SelectionView", context);
-            context.SetController(controller);
-            Game1.activeClickableMenu = controller.Menu;
+                who.applyBuff(pair.Key);
+            }
         }
         else
         {
@@ -232,9 +191,8 @@ public class ObjectPatch
         return false;
     }
 
-    private static void ApplyBlessing(StardewObject __instance, Farmer who, GameLocation location, string blessing)
+    private static void ApplyBlessing(StardewObject __instance, Farmer who, GameLocation location)
     {
-        who.applyBuff(blessing);
         who.hasBeenBlessedByStatueToday = true;
         Game1.playSound("statue_of_blessings", null);
         __instance.showNextIndex.Value = true;

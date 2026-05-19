@@ -1,7 +1,6 @@
 ﻿using GenericModConfigMenu;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewUI.Framework;
 using StardewValley;
 
 namespace SelectableBuffs;
@@ -28,32 +27,6 @@ public class ModEntry : Mod
 
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
-        try
-        {
-            Singletons.ViewEngine = Helper.ModRegistry.GetApi<IViewEngine>("focustense.StardewUI");
-            if (Singletons.ViewEngine is null)
-            {
-                Singletons.Monitor.Log("Couldn't initialize IViewEngine api.", LogLevel.Error);
-                return;
-            }
-
-            Singletons.ViewEngine.RegisterViews($"Mods/{Singletons.ModManifest.UniqueID}/views", "assets/views");
-#if DEBUG
-            Singletons.ViewEngine.EnableHotReloadingWithSourceSync();
-#else
-            Singletons.ViewEngine.PreloadAssets();
-            Singletons.ViewEngine.PreloadModels(typeof(ViewModels.SelectionViewModel));
-
-            ViewModels.SelectionViewModel context = new(I18n.ChooseBlessing(), new List<SelectionOption>(), _ => { });
-            IMenuController controller = Singletons.ViewEngine.CreateMenuControllerFromAsset($"Mods/{Singletons.ModManifest.UniqueID}/views/SelectionView", context);
-#endif
-        }
-        catch (Exception ex)
-        {
-            Singletons.Monitor.Log("Failed to initialize StardewUI: " + ex, LogLevel.Error);
-            return;
-        }
-
         try
         {
             IGenericModConfigMenuApi? gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
